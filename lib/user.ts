@@ -1,7 +1,7 @@
 "use server";
 
 import { z } from "zod";
-import { PrismaClient, Prisma } from "@prisma/client";
+import { PrismaClient } from "@prisma/client";
 import crypto from "crypto";
 import bcrypt from "bcryptjs";
 
@@ -12,6 +12,14 @@ const schemaUser = z.object({
   password: z.string().min(6),
   name: z.string().min(1),
 });
+function isPrismaDuplicateError(error: unknown): error is { code: string } {
+  return (
+    typeof error === "object" &&
+    error !== null &&
+    "code" in error &&
+    typeof (error as { code: unknown }).code === "string"
+  );
+}
 
 export const createUser = async (formData: FormData) => {
   try {
@@ -35,22 +43,22 @@ export const createUser = async (formData: FormData) => {
     const hashedPassword = await bcrypt.hash(validated.data.password, 10);
 
     // Create user
-    const user = await prisma.user.create({
-      data: {
-        userId,
-        email: validated.data.email,
-        password: hashedPassword,
-      },
-    });
+const user = await prisma.user.create({
+  data: {
+    userId,
+    email: validated.data.email,
+    password: hashedPassword,
+    name: validated.data.name,  // ⚠️ Энэ мөрийг нэмэх ёстой
+  },
+});
 
     return { message: "User created successfully", user };
-  } catch (error: unknown) {
-    if (
-      error instanceof Prisma.PrismaClientKnownRequestError &&
-      error.code === "P2002"
-    ) {
-      return { error: "Email already exists" };
-    }
-    return { error: "Failed to create user" };
+} catch (error: unknown) {
+  if (isPrismaDuplicateError(error) && error.code === "P2002") {
+    return { error: "Email already exists" };
   }
+
+  return { error: "Failed to create user" };
+}
+
 };

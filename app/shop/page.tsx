@@ -1,6 +1,6 @@
 "use client";
 
-export const ShopPage = () => {
+ const ShopPage = () => {
   const products = [
     {
       id: 1,

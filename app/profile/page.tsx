@@ -6,8 +6,7 @@ import { useEffect, useState } from "react";
 import axios from "axios";
 import { ProfileData } from "../types/profile";
 import { LoadingSpinner, ProfileDisplay, ProfileForm } from "../components";
-import { useProfile } from "@/lib/userProfile";
-export const ProfilePage = () => {
+ const ProfilePage = () => {
   const { user, isLoaded } = useUser();
   const router = useRouter();
 
@@ -108,7 +107,7 @@ export const ProfilePage = () => {
   }
 
   if (profile) {
-    return <ProfileDisplay profile={profile} user={user} />;
+    return <ProfileDisplay profile={profile} user={{ ...user, firstName: user.firstName ?? "User" }} />
   }
 
   return (

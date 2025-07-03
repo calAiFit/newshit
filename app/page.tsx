@@ -1,6 +1,6 @@
 import { BMICalculator } from "./components";
 
-export const Home = () => {
+ const Home = () => {
   return (
     <div className="min-h-screen bg-white">
       <div className="max-w-4xl mx-auto px-4 py-8">

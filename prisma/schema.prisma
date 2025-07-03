@@ -1,0 +1,23 @@
+// prisma/schema.prisma
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql" // Хэрвээ та mongodb эсвэл mysql ашиглаж байвал солино
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  userId   String @id @default(uuid())
+  email    String @unique
+  password String
+  name     String
+}
+model Profile {
+  id     String @id @default(uuid())
+  userId String @unique
+  bio    String?
+  // бусад талбарууд
+}
