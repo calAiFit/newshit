@@ -3,6 +3,7 @@
 
 import { gql, useQuery, useMutation } from "@apollo/client";
 import UsersList from "./components/UserList";
+import TestForm from "@/components/TestForm";
 
 const GET_USERS = gql`
   query GetUsers {
@@ -53,6 +54,7 @@ export default function Home() {
       {mutationError && (
         <p className="text-red-600 mt-2">Error: {mutationError.message}</p>
       )}
+      <TestForm />
     </div>
   );
 }
