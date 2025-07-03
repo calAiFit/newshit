@@ -15,7 +15,6 @@ export const ProfilePage = () => {
   const [submitting, setSubmitting] = useState(false);
   const [profile, setProfile] = useState<ProfileData | null>(null);
   const [error, setError] = useState<string | null>(null);
-  const profilesss = useProfile();
   useEffect(() => {
     if (!isLoaded) return;
     if (!user) {

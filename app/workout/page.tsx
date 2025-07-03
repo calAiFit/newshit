@@ -63,7 +63,8 @@ export default function WorkoutPage() {
   const [activityLevel, setActivityLevel] = useState("Light");
   const [caloriesBurned, setCaloriesBurned] = useState("");
   const [loading, setLoading] = useState(false);
-
+  console.log(selectedCategory);
+  
   const MET_VALUES: METValues = {
     Light: {
       Walking: 3.0,

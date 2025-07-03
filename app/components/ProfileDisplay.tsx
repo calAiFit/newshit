@@ -1,10 +1,13 @@
 "use client";
 
 import { ProfileData } from "../types/profile";
+interface User {
+  firstName: string;
+}
 
 interface ProfileDisplayProps {
   profile: ProfileData;
-  user: any;
+  user: User;
 }
 
 export const ProfileDisplay = ({ profile, user }: ProfileDisplayProps) => {

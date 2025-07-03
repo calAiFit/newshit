@@ -34,6 +34,7 @@ export default function TestForm() {
         setEmail("");
       }
     } catch (error) {
+      console.log(error);
       setMessage("Error submitting data");
     }
   };

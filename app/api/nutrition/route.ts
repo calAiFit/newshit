@@ -22,6 +22,7 @@ export async function POST(request: Request) {
     const data = await response.json();
     return NextResponse.json({ nutrition: data.foods?.[0] });
   } catch (error) {
+    console.error(error);
     return NextResponse.json({ error: "Nutrition fetch failed" }, { status: 500 });
   }
 }

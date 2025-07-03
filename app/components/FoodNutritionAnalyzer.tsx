@@ -16,6 +16,8 @@ interface NutritionData {
 export const FoodNutritionAnalyzer = () => {
   const [imageBase64, setImageBase64] = useState<string | null>(null);
   const [detectedFood, setDetectedFood] = useState<string>("");
+  console.log(detectedFood);
+  
   const [foodSearch, setFoodSearch] = useState<string>("");
   const [nutrition, setNutrition] = useState<NutritionData | null>(null);
   const [grams, setGrams] = useState(100);
@@ -59,23 +61,23 @@ export const FoodNutritionAnalyzer = () => {
     return data.nutrition;
   }
 
-  const handleImageAnalyze = async () => {
-    if (!imageBase64) return;
-    setError(null);
-    setDetectedFood("");
-    setNutrition(null);
-    setLoading(true);
-    try {
-      const label = await classifyImage(imageBase64);
-      setDetectedFood(label);
-      const nutri = await fetchNutrition(label);
-      setNutrition(nutri);
-    } catch (err: any) {
-      setError(err.message || "Unexpected error");
-    } finally {
-      setLoading(false);
+const handleImageAnalyze = async () => {
+   if (!imageBase64) return;
+  try {
+    const label = await classifyImage(imageBase64);
+    setDetectedFood(label);
+    const nutri = await fetchNutrition(label);
+    setNutrition(nutri);
+  } catch (err: unknown) {
+    if (err instanceof Error) {
+      setError(err.message);
+    } else {
+      setError("Unexpected error");
     }
-  };
+  } finally {
+    setLoading(false);
+  }
+};
 
   const handleUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
@@ -84,20 +86,20 @@ export const FoodNutritionAnalyzer = () => {
     setImageBase64(base64);
   };
 
-  const handleFoodSearch = async () => {
-    if (!foodSearch.trim()) return;
-    setError(null);
-    setNutrition(null);
-    setSearchLoading(true);
-    try {
-      const nutri = await fetchNutrition(foodSearch);
-      setNutrition(nutri);
-    } catch (err: any) {
-      setError(err.message || "Food not found");
-    } finally {
-      setSearchLoading(false);
+const handleFoodSearch = async () => {
+  try {
+    const nutri = await fetchNutrition(foodSearch);
+    setNutrition(nutri);
+  } catch (err: unknown) {
+    if (err instanceof Error) {
+      setError(err.message);
+    } else {
+      setError("Food not found");
     }
-  };
+  } finally {
+    setSearchLoading(false);
+  }
+};
 
   return (
     <div className="bg-white rounded-2xl p-6 shadow-sm">

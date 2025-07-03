@@ -21,7 +21,7 @@ export default function CaloriePage() {
     const weightNum = parseFloat(weight);
     const heightNum = parseFloat(height);
 
-    let bmr = 66 + 13.7 * weightNum + 5 * heightNum - 6.8 * ageNum;
+    const bmr = 66 + 13.7 * weightNum + 5 * heightNum - 6.8 * ageNum;
 
     let multiplier = 1.2; // Sedentary
     switch (activityLevel) {

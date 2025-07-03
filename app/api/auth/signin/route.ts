@@ -39,6 +39,7 @@ export async function POST(request: Request) {
       user: { id: existingUser.id, email: existingUser.email },
     });
   } catch (error) {
+     console.error(error); 
     return NextResponse.json({ error: "Sign-in failed" }, { status: 500 });
   }
 }

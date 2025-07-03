@@ -1,5 +1,12 @@
 // app/test/components/UsersList.tsx
-export default function UsersList({ users }: { users: any[] }) {
+interface User {
+  id: string;
+  email: string;
+  role: string;
+  createdAt: string; // эсвэл Date гэдгийг мэдэхгүй бол түр `string` гэж өгч болно
+}
+
+export default function UsersList({ users }: { users: User[] }) {
   return (
     <ul>
       {users.map((user) => (
