@@ -248,6 +248,13 @@ export const FoodNutritionAnalyzer = () => {
         </div>
       )}
 
+      {/* Show detected food name */}
+      {detectedFood && (
+        <p className="hidden mb-2 text-center text-gray-700 font-semibold">
+          Detected Food: {detectedFood}
+        </p>
+      )}
+
       {nutrition && (
         <div className="bg-purple-50 p-3 rounded-xl">
           <div className="grid grid-cols-2 gap-2 text-sm text-gray-900">
