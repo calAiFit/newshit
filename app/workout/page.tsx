@@ -158,8 +158,8 @@ export default function WorkoutPage() {
         </div>
 
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
-          {/* Categories */}
-          <div className="bg-white rounded-2xl shadow-md">
+          {/* Categories (Left on large screens) */}
+          <div className="bg-white rounded-2xl shadow-md order-2 lg:order-1">
             <div className="p-6">
               <h2 className="text-2xl font-semibold text-gray-900 mb-6">
                 Workout Categories
@@ -199,8 +199,8 @@ export default function WorkoutPage() {
             </div>
           </div>
 
-          {/* Calculator */}
-          <div className="bg-white rounded-2xl shadow-md">
+          {/* Calculator (Right on large screens) */}
+          <div className="bg-white rounded-2xl shadow-md order-1 lg:order-2">
             <div className="p-6">
               <h2 className="text-2xl font-semibold text-gray-900 mb-6">
                 Workout Calculator
