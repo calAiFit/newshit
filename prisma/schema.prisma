@@ -16,8 +16,15 @@ model User {
   name     String
 }
 model Profile {
-  id     String @id @default(uuid())
-  userId String @unique
-  bio    String?
-  // бусад талбарууд
+  id            String @id @default(uuid())
+  userId        String @unique
+  name          String
+  age           Int
+  gender        String
+  height        Int
+  weight        Int
+  targetWeight  Int
+  activityLevel String
+  avatarUrl     String
+  bio           String?
 }

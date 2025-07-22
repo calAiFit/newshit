@@ -6,12 +6,13 @@
     "dev": "next dev --turbopack",
     "build": "next build",
     "start": "next start",
-     "postinstall": "prisma generate",
+    "postinstall": "prisma generate",
     "lint": "next lint"
   },
   "dependencies": {
     "@apollo/client": "^3.13.8",
-    "@clerk/nextjs": "^6.23.2",
+    "@clerk/clerk-sdk-node": "^4.13.23",
+    "@clerk/nextjs": "^6.25.4",
     "@prisma/client": "^6.11.0",
     "@radix-ui/react-select": "^2.2.5",
     "@radix-ui/react-slot": "^1.2.3",
@@ -37,7 +38,7 @@
     "@types/react-dom": "^19",
     "eslint": "^9",
     "eslint-config-next": "15.3.4",
-    "prisma": "^6.11.0",
+    "prisma": "^6.12.0",
     "tailwindcss": "^4",
     "tw-animate-css": "^1.3.4",
     "typescript": "^5"

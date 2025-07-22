@@ -64,7 +64,7 @@ export default function WorkoutPage() {
   const [caloriesBurned, setCaloriesBurned] = useState("");
   const [loading, setLoading] = useState(false);
   console.log(selectedCategory);
-  
+
   const MET_VALUES: METValues = {
     Light: {
       Walking: 3.0,
@@ -208,7 +208,6 @@ export default function WorkoutPage() {
             </div>
           </div>
 
-          {/* Workout Calculator */}
           <div className="bg-white rounded-2xl shadow-sm">
             <div className="p-6">
               <h2 className="text-2xl font-semibold text-gray-900 mb-6">
@@ -227,9 +226,6 @@ export default function WorkoutPage() {
                     className="w-full px-4 py-3 rounded-xl bg-white border border-gray-300 text-gray-900 focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-purple-500 pr-10"
                     placeholder="Enter your weight"
                   />
-                  <span className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-500">
-                    kg
-                  </span>
                 </div>
 
                 <div>
@@ -243,9 +239,6 @@ export default function WorkoutPage() {
                     className="w-full px-4 py-3 rounded-xl bg-white border border-gray-300 text-gray-900 focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-purple-500 pr-10"
                     placeholder="Enter workout duration"
                   />
-                  <span className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-500">
-                    min
-                  </span>
                 </div>
 
                 <div>

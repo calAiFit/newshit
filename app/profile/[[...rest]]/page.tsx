@@ -4,9 +4,9 @@ import { useUser, SignIn } from "@clerk/nextjs";
 import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 import axios from "axios";
-import { ProfileData } from "../types/profile";
-import { LoadingSpinner, ProfileDisplay, ProfileForm } from "../components";
- const ProfilePage = () => {
+import { ProfileData } from "@/app/types/profile";
+import { LoadingSpinner, ProfileDisplay, ProfileForm } from "@/app/components";
+const ProfilePage = () => {
   const { user, isLoaded } = useUser();
   const router = useRouter();
 
@@ -107,7 +107,12 @@ import { LoadingSpinner, ProfileDisplay, ProfileForm } from "../components";
   }
 
   if (profile) {
-    return <ProfileDisplay profile={profile} user={{ ...user, firstName: user.firstName ?? "User" }} />
+    return (
+      <ProfileDisplay
+        profile={profile}
+        user={{ ...user, firstName: user.firstName ?? "User" }}
+      />
+    );
   }
 
   return (

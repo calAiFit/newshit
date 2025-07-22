@@ -1,9 +1,10 @@
 import { NextRequest, NextResponse } from "next/server";
-import { getAuth, clerkClient } from "@clerk/nextjs/server";
+import { getAuth } from "@clerk/nextjs/server";
+import { clerkClient } from "@clerk/clerk-sdk-node";
 import prisma from "@/lib/prisma";
 
 export async function GET(req: NextRequest) {
-  const { userId } = getAuth(req);
+  const { userId } = await getAuth(req);
   if (!userId) {
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
   }
@@ -25,8 +26,7 @@ export async function GET(req: NextRequest) {
 
 export async function POST(req: NextRequest) {
   try {
-    const auth = await getAuth(req);
-    const { userId } = auth;
+    const { userId } = await getAuth(req);
 
     if (!userId) {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
@@ -52,8 +52,7 @@ export async function POST(req: NextRequest) {
     }
 
     // Prepare profile data
-    const client = await clerkClient();
-    const user = await client.users.getUser(userId);
+    const user = await clerkClient.users.getUser(userId);
     const data = {
       name: user?.firstName || "Anonymous",
       age: body.age,

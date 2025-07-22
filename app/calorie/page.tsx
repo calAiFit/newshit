@@ -83,6 +83,7 @@ export default function CaloriePage() {
         </div>
 
         <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+          <FoodNutritionAnalyzer />
           <div className="bg-white rounded-2xl shadow-sm">
             <div className="p-6">
               <div className="flex items-center justify-between mb-6">
@@ -215,8 +216,6 @@ export default function CaloriePage() {
               </form>
             </div>
           </div>
-
-          <FoodNutritionAnalyzer />
         </div>
       </div>
     </div>
