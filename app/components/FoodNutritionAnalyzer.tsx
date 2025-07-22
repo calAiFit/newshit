@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import Image from "next/image";
 
 interface NutritionData {
   food_name: string;
@@ -148,11 +149,14 @@ export const FoodNutritionAnalyzer = () => {
       )}
 
       {imageBase64 && (
-        <div className="relative w-full h-48 mb-4">
-          <img
+        <div className="relative w-full h-48 mb-4 rounded-xl overflow-hidden border border-gray-300">
+          {/* Use next/image for optimization */}
+          <Image
             src={imageBase64}
             alt="Selected"
-            className="object-contain w-full h-full rounded-xl border border-gray-300"
+            fill
+            style={{ objectFit: "contain" }}
+            sizes="100vw"
           />
           <button
             onClick={() => setImageBase64(null)}
