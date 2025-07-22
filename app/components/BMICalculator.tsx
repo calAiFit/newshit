@@ -15,16 +15,57 @@ import { motion } from "framer-motion";
 
 export const BMICalculator = () => {
   const [weight, setWeight] = useState("");
-  const [height, setHeight] = useState("");
-  const [gender, setGender] = useState("");
+  const [weightUnit, setWeightUnit] = useState<"kg" | "lbs">("kg");
+  const [heightCm, setHeightCm] = useState("");
   const [age, setAge] = useState("");
+  const [gender, setGender] = useState("");
+
+  const [errors, setErrors] = useState({
+    weight: "",
+    heightCm: "",
+    age: "",
+    gender: "",
+  });
+
   const [bmi, setBMI] = useState("");
   const [bmiCategory, setBMICategory] = useState("");
   const [showResults, setShowResults] = useState(false);
+
+  const handleNumericInput = (
+    value: string,
+    setter: (val: string) => void,
+    maxLength = 3
+  ) => {
+    const numeric = value.replace(/\D/g, "").slice(0, maxLength);
+    setter(numeric);
+  };
+
+  const validateInputs = () => {
+    const newErrors = {
+      weight: weight ? "" : "Weight is required",
+      heightCm: heightCm ? "" : "Height is required",
+      age: age ? "" : "Age is required",
+      gender: gender ? "" : "Gender is required",
+    };
+    setErrors(newErrors);
+    return Object.values(newErrors).every((e) => !e);
+  };
+
   const calculateBMI = () => {
-    if (!weight || !height) return;
-    const w = parseFloat(weight);
-    const h = parseFloat(height) / 100;
+    if (!validateInputs()) return;
+
+    let w = parseFloat(weight);
+    // Convert lbs to kg if needed
+    if (weightUnit === "lbs") {
+      w = w * 0.453592;
+    }
+    const h = parseFloat(heightCm) / 100;
+
+    if (h === 0) {
+      setErrors((prev) => ({ ...prev, heightCm: "Height cannot be zero" }));
+      return;
+    }
+
     const bmiNumber = w / (h * h);
     const bmiValue = bmiNumber.toFixed(1);
     setBMI(bmiValue);
@@ -37,47 +78,87 @@ export const BMICalculator = () => {
   };
 
   return (
-    <div className="max-w-2xl mx-auto py-10 px-4">
+    <div className="max-w-md mx-auto py-10 px-4">
       <Card className="p-8 rounded-2xl shadow-lg bg-white">
-        <h1 className="text-4xl font-bold text-purple-700 mb-8 text-center">
+        <h1 className="text-3xl font-bold text-purple-700 mb-8 text-center">
           BMI Calculator
         </h1>
 
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
-          <div className="space-y-4">
-            <label className="text-sm text-gray-600">Weight (kg)</label>
-            <Input
-              type="number"
-              value={weight}
-              onChange={(e) => setWeight(e.target.value)}
-              placeholder="Enter weight"
-              className="w-full p-3 border border-gray-200 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent"
-            />
+        <div className="space-y-6">
+          {/* Weight with unit selector */}
+          <div>
+            <label className="block mb-2 text-gray-700 font-medium">
+              Weight
+            </label>
+            <div className="flex gap-3">
+              <Input
+                type="text"
+                inputMode="numeric"
+                value={weight}
+                onChange={(e) => handleNumericInput(e.target.value, setWeight)}
+                placeholder="Enter weight"
+                className="flex-grow"
+                maxLength={3}
+              />
+              <Select
+                value={weightUnit}
+                onValueChange={(val) => setWeightUnit(val as "kg" | "lbs")}
+              >
+                <SelectTrigger className="w-24">
+                  <SelectValue />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="kg">kg</SelectItem>
+                  <SelectItem value="lbs">lbs</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
+            {errors.weight && (
+              <p className="text-red-500 text-sm mt-1">{errors.weight}</p>
+            )}
           </div>
-          <div className="space-y-4">
-            <label className="text-sm text-gray-600">Height (cm)</label>
+
+          {/* Height in cm only */}
+          <div>
+            <label className="block mb-2 text-gray-700 font-medium">
+              Height (cm)
+            </label>
             <Input
-              type="number"
-              value={height}
-              onChange={(e) => setHeight(e.target.value)}
-              placeholder="Enter height"
-              className="w-full p-3 border border-gray-200 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent"
+              type="text"
+              inputMode="numeric"
+              value={heightCm}
+              onChange={(e) => handleNumericInput(e.target.value, setHeightCm)}
+              placeholder="Enter height in cm"
+              maxLength={3}
             />
+            {errors.heightCm && (
+              <p className="text-red-500 text-sm mt-1">{errors.heightCm}</p>
+            )}
           </div>
-          <div className="space-y-4">
-            <label className="text-sm text-gray-600">Age</label>
+
+          {/* Age */}
+          <div>
+            <label className="block mb-2 text-gray-700 font-medium">Age</label>
             <Input
-              type="number"
+              type="text"
+              inputMode="numeric"
               value={age}
-              onChange={(e) => setAge(e.target.value)}
+              onChange={(e) => handleNumericInput(e.target.value, setAge)}
               placeholder="Enter age"
-              className="w-full p-3 border border-gray-200 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent"
+              maxLength={3}
             />
+            {errors.age && (
+              <p className="text-red-500 text-sm mt-1">{errors.age}</p>
+            )}
           </div>
-          <div className="space-y-4">
-            <label className="text-sm text-gray-600">Gender</label>
+
+          {/* Gender */}
+          <div>
+            <label className="block mb-2 text-gray-700 font-medium">
+              Gender
+            </label>
             <Select value={gender} onValueChange={setGender}>
-              <SelectTrigger className="w-full p-3 border border-gray-200 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent">
+              <SelectTrigger>
                 <SelectValue placeholder="Select gender" />
               </SelectTrigger>
               <SelectContent>
@@ -85,34 +166,40 @@ export const BMICalculator = () => {
                 <SelectItem value="female">Female</SelectItem>
               </SelectContent>
             </Select>
+            {errors.gender && (
+              <p className="text-red-500 text-sm mt-1">{errors.gender}</p>
+            )}
+          </div>
+
+          {/* Buttons */}
+          <div className="flex gap-4 justify-center mt-6">
+            <Button
+              onClick={calculateBMI}
+              className="bg-gradient-to-r from-purple-600 to-purple-700 hover:from-purple-700 hover:to-purple-800 text-white rounded-xl px-8 py-3 font-semibold transition-all duration-300"
+            >
+              Calculate BMI
+            </Button>
+            {showResults && (
+              <Button
+                onClick={() => {
+                  setWeight("");
+                  setHeightCm("");
+                  setAge("");
+                  setGender("");
+                  setBMI("");
+                  setBMICategory("");
+                  setShowResults(false);
+                  setErrors({ weight: "", heightCm: "", age: "", gender: "" });
+                }}
+                className="bg-gray-200 hover:bg-gray-300 text-gray-700 rounded-xl px-8 py-3 font-semibold transition-all duration-300"
+              >
+                Reset
+              </Button>
+            )}
           </div>
         </div>
 
-        <div className="flex gap-4 justify-center">
-          <Button
-            onClick={calculateBMI}
-            className="bg-gradient-to-r from-purple-600 to-purple-700 hover:from-purple-700 hover:to-purple-800 text-white rounded-xl px-8 py-3 font-semibold transition-all duration-300"
-          >
-            Calculate BMI
-          </Button>
-          {showResults && (
-            <Button
-              onClick={() => {
-                setWeight("");
-                setHeight("");
-                setAge("");
-                setGender("");
-                setBMI("");
-                setBMICategory("");
-                setShowResults(false);
-              }}
-              className="bg-gray-200 hover:bg-gray-300 text-gray-700 rounded-xl px-8 py-3 font-semibold transition-all duration-300"
-            >
-              Reset
-            </Button>
-          )}
-        </div>
-
+        {/* Results */}
         {showResults && (
           <motion.div
             initial={{ opacity: 0, y: 20 }}
@@ -138,7 +225,7 @@ export const BMICalculator = () => {
                     }}
                   />
                 </div>
-                <div className="flex justify-between text-sm text-gray-600">
+                <div className="flex justify-between text-sm text-gray-600 w-full">
                   <span>18.5</span>
                   <span>25</span>
                   <span>30</span>

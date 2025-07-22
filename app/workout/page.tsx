@@ -56,64 +56,87 @@ const CATEGORIES: WorkoutCategory[] = [
   },
 ];
 
+const CATEGORY_MET_KEYS: { [key: string]: string } = {
+  "Strength Training": "Strength",
+  Cardio: "Cardio",
+  Yoga: "Yoga",
+  HIIT: "HIIT",
+};
+
+const MET_VALUES: METValues = {
+  Light: {
+    Strength: 3.5,
+    Cardio: 4.0,
+    Yoga: 2.5,
+    HIIT: 5.0,
+  },
+  Moderate: {
+    Strength: 6.0,
+    Cardio: 6.0,
+    Yoga: 3.0,
+    HIIT: 8.0,
+  },
+  Heavy: {
+    Strength: 8.0,
+    Cardio: 9.0,
+    Yoga: 4.0,
+    HIIT: 12.0,
+  },
+};
+
 export default function WorkoutPage() {
   const [selectedCategory, setSelectedCategory] = useState<string>("");
   const [weight, setWeight] = useState("");
+  const [weightUnit, setWeightUnit] = useState<"kg" | "lb">("kg");
   const [duration, setDuration] = useState("");
   const [activityLevel, setActivityLevel] = useState("Light");
   const [caloriesBurned, setCaloriesBurned] = useState("");
   const [loading, setLoading] = useState(false);
-  console.log(selectedCategory);
+  const [error, setError] = useState("");
 
-  const MET_VALUES: METValues = {
-    Light: {
-      Walking: 3.0,
-      Yoga: 2.5,
-      Stretching: 2.0,
-      LightGym: 3.5,
-    },
-    Moderate: {
-      Jogging: 7.0,
-      Cycling: 5.5,
-      Swimming: 6.0,
-      Strength: 6.0,
-    },
-    Heavy: {
-      Running: 10.0,
-      HIIT: 12.0,
-      HeavyCycling: 14.0,
-      HeavyStrength: 8.0,
-    },
+  const handleNumericInput = (value: string, setter: (val: string) => void) => {
+    const numeric = value.replace(/\D/g, "").slice(0, 3);
+    setter(numeric);
   };
 
+  const convertLbToKg = (lb: number) => lb * 0.453592;
+
   const calculateCalories = () => {
-    if (!weight || !duration || !activityLevel) return;
-
-    setLoading(true);
-
-    const w = parseFloat(weight);
-    const d = parseFloat(duration);
-
-    // Get MET value based on activity level
-    const activityLevels = MET_VALUES[activityLevel as keyof METValues];
-    const met = Object.values(activityLevels)[0];
-
-    if (typeof met !== "number") {
-      setLoading(false);
+    setError("");
+    if (!weight || !duration || !selectedCategory || !activityLevel) {
+      setError("Please fill in all fields including workout category.");
       return;
     }
 
-    const calories = (met * w * (d / 60)).toFixed(1);
+    let w = parseFloat(weight);
+    const d = parseFloat(duration);
 
+    if (weightUnit === "lb") {
+      w = convertLbToKg(w);
+    }
+
+    const categoryKey = CATEGORY_MET_KEYS[selectedCategory];
+    const met = MET_VALUES[activityLevel][categoryKey];
+
+    if (!met) {
+      setError("MET value not found for selected category.");
+      setCaloriesBurned("");
+      return;
+    }
+
+    setLoading(true);
+    const calories = (met * w * (d / 60)).toFixed(1);
     setCaloriesBurned(calories);
     setLoading(false);
   };
 
   return (
-    <div className="min-h-screen bg-white">
-      <div className="max-w-4xl mx-auto px-4 py-8">
-        <div className="flex items-center justify-between mb-8">
-          <h1 className="text-3xl font-bold text-gray-900">Workout Planner</h1>
+    <div className="min-h-screen bg-white px-4 py-8 sm:px-6 lg:px-8">
+      <div className="max-w-4xl mx-auto">
+        <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between mb-8">
+          <h1 className="text-3xl font-bold text-gray-900 mb-4 sm:mb-0">
+            Workout Planner
+          </h1>
           <div className="flex items-center gap-2">
             <svg
               className="w-6 h-6 text-purple-600"
@@ -134,36 +157,22 @@ export default function WorkoutPage() {
           </div>
         </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-          {/* Workout Categories */}
-          <div className="bg-white rounded-2xl shadow-sm">
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
+          {/* Categories */}
+          <div className="bg-white rounded-2xl shadow-md">
             <div className="p-6">
-              <div className="flex items-center justify-between mb-6">
-                <h2 className="text-2xl font-semibold text-gray-900">
-                  Workout Categories
-                </h2>
-                <div className="w-12 h-12 rounded-full bg-purple-100 flex items-center justify-center">
-                  <svg
-                    className="w-6 h-6 text-purple-600"
-                    fill="none"
-                    stroke="currentColor"
-                    viewBox="0 0 24 24"
-                  >
-                    <path
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                      strokeWidth={2}
-                      d="M13 10V3L4 14h7v7l9-11h-7z"
-                    />
-                  </svg>
-                </div>
-              </div>
-
+              <h2 className="text-2xl font-semibold text-gray-900 mb-6">
+                Workout Categories
+              </h2>
               <div className="space-y-6">
                 {CATEGORIES.map((category, index) => (
                   <div
                     key={index}
-                    className="bg-gray-50 rounded-xl p-4 hover:bg-gray-100 transition-colors cursor-pointer"
+                    className={`rounded-xl p-4 transition cursor-pointer border ${
+                      selectedCategory === category.name
+                        ? "bg-purple-100 border-purple-600"
+                        : "bg-gray-50 hover:bg-gray-100 border-gray-200"
+                    }`}
                     onClick={() => setSelectedCategory(category.name)}
                   >
                     <div className="flex items-center gap-4 mb-2">
@@ -179,76 +188,76 @@ export default function WorkoutPage() {
                         <p className="text-gray-600">{category.description}</p>
                       </div>
                     </div>
-                    <div className="mt-4 space-y-2">
-                      {category.benefits.map((benefit, i) => (
-                        <div
-                          key={i}
-                          className="flex items-center gap-2 text-gray-600"
-                        >
-                          <svg
-                            className="w-4 h-4 text-purple-600"
-                            fill="none"
-                            stroke="currentColor"
-                            viewBox="0 0 24 24"
-                          >
-                            <path
-                              strokeLinecap="round"
-                              strokeLinejoin="round"
-                              strokeWidth={2}
-                              d="M5 13l4 4L19 7"
-                            />
-                          </svg>
-                          <span>{benefit}</span>
-                        </div>
+                    <ul className="mt-2 text-sm text-gray-600 list-disc ml-6">
+                      {category.benefits.map((b, i) => (
+                        <li key={i}>{b}</li>
                       ))}
-                    </div>
+                    </ul>
                   </div>
                 ))}
               </div>
             </div>
           </div>
 
-          <div className="bg-white rounded-2xl shadow-sm">
+          {/* Calculator */}
+          <div className="bg-white rounded-2xl shadow-md">
             <div className="p-6">
               <h2 className="text-2xl font-semibold text-gray-900 mb-6">
                 Workout Calculator
               </h2>
-
               <div className="space-y-6">
                 <div>
-                  <label className="block text-sm font-medium mb-2 text-gray-700">
-                    Weight (kg)
+                  <label className="block text-sm mb-2 text-gray-700">
+                    Weight
                   </label>
-                  <input
-                    type="number"
-                    value={weight}
-                    onChange={(e) => setWeight(e.target.value)}
-                    className="w-full px-4 py-3 rounded-xl bg-white border border-gray-300 text-gray-900 focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-purple-500 pr-10"
-                    placeholder="Enter your weight"
-                  />
+                  <div className="flex gap-4">
+                    <input
+                      type="text"
+                      inputMode="numeric"
+                      value={weight}
+                      onChange={(e) =>
+                        handleNumericInput(e.target.value, setWeight)
+                      }
+                      className="flex-1 px-4 py-3 rounded-xl border border-gray-300 focus:ring-2 focus:ring-purple-500 focus:outline-none"
+                      placeholder={`Enter your weight in ${weightUnit}`}
+                    />
+                    <select
+                      value={weightUnit}
+                      onChange={(e) =>
+                        setWeightUnit(e.target.value as "kg" | "lb")
+                      }
+                      className="px-4 py-3 rounded-xl border border-gray-300 focus:ring-2 focus:ring-purple-500 focus:outline-none"
+                    >
+                      <option value="kg">kg</option>
+                      <option value="lb">lb</option>
+                    </select>
+                  </div>
                 </div>
 
                 <div>
-                  <label className="block text-sm font-medium mb-2 text-gray-700">
+                  <label className="block text-sm mb-2 text-gray-700">
                     Duration (minutes)
                   </label>
                   <input
-                    type="number"
+                    type="text"
+                    inputMode="numeric"
                     value={duration}
-                    onChange={(e) => setDuration(e.target.value)}
-                    className="w-full px-4 py-3 rounded-xl bg-white border border-gray-300 text-gray-900 focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-purple-500 pr-10"
+                    onChange={(e) =>
+                      handleNumericInput(e.target.value, setDuration)
+                    }
+                    className="w-full px-4 py-3 rounded-xl border border-gray-300 focus:ring-2 focus:ring-purple-500 focus:outline-none"
                     placeholder="Enter workout duration"
                   />
                 </div>
 
                 <div>
-                  <label className="block text-sm font-medium mb-2 text-gray-700">
+                  <label className="block text-sm mb-2 text-gray-700">
                     Activity Level
                   </label>
                   <select
                     value={activityLevel}
                     onChange={(e) => setActivityLevel(e.target.value)}
-                    className="w-full px-4 py-3 rounded-xl bg-white border border-gray-300 text-gray-900 focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-purple-500"
+                    className="w-full px-4 py-3 rounded-xl border border-gray-300 focus:ring-2 focus:ring-purple-500 focus:outline-none"
                   >
                     <option value="Light">Light</option>
                     <option value="Moderate">Moderate</option>
@@ -259,56 +268,24 @@ export default function WorkoutPage() {
                 <button
                   onClick={calculateCalories}
                   disabled={loading}
-                  className="w-full flex items-center justify-center gap-2 bg-gradient-to-r from-purple-600 to-purple-700 text-white py-3 px-6 rounded-xl transition-all duration-200 shadow-sm hover:shadow-md disabled:opacity-50 disabled:cursor-not-allowed"
+                  className="w-full bg-gradient-to-r from-purple-600 to-purple-700 text-white py-3 px-6 rounded-xl font-semibold transition hover:opacity-90 disabled:opacity-50"
                 >
-                  {loading ? (
-                    <svg
-                      className="animate-spin h-5 w-5 text-white"
-                      xmlns="http://www.w3.org/2000/svg"
-                      fill="none"
-                      viewBox="0 0 24 24"
-                    >
-                      <circle
-                        className="opacity-25"
-                        cx="12"
-                        cy="12"
-                        r="10"
-                        stroke="currentColor"
-                        strokeWidth="4"
-                      ></circle>
-                      <path
-                        className="opacity-75"
-                        fill="currentColor"
-                        d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
-                      ></path>
-                    </svg>
-                  ) : (
-                    <svg
-                      className="w-5 h-5"
-                      fill="none"
-                      stroke="currentColor"
-                      viewBox="0 0 24 24"
-                    >
-                      <path
-                        strokeLinecap="round"
-                        strokeLinejoin="round"
-                        strokeWidth={2}
-                        d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"
-                      />
-                    </svg>
-                  )}
-                  Calculate Calories Burned
+                  {loading ? "Calculating..." : "Calculate Calories Burned"}
                 </button>
 
+                {error && (
+                  <div className="mt-2 text-red-600 text-sm">{error}</div>
+                )}
+
                 {caloriesBurned && (
-                  <div className="mt-6 p-4 rounded-xl bg-purple-50 text-purple-700">
-                    <div className="flex items-center justify-between">
+                  <div className="mt-6 p-4 bg-purple-50 rounded-xl text-purple-800">
+                    <div className="flex justify-between items-center">
                       <div>
                         <h3 className="text-lg font-semibold">
                           Calories Burned
                         </h3>
-                        <p className="text-sm text-purple-600">
-                          Based on your weight and activity level
+                        <p className="text-sm text-purple-700">
+                          Based on input and MET values
                         </p>
                       </div>
                       <div className="text-2xl font-bold">

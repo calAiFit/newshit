@@ -7,23 +7,97 @@ import { FoodNutritionAnalyzer } from "../components";
 export default function CaloriePage() {
   const [age, setAge] = useState("");
   const [weight, setWeight] = useState("");
-  const [height, setHeight] = useState("");
+  const [weightUnit, setWeightUnit] = useState<"kg" | "lb">("kg");
+  const [heightUnit, setHeightUnit] = useState<"cm" | "ft">("cm");
+  const [heightCm, setHeightCm] = useState("");
+  const [heightFt, setHeightFt] = useState("");
+  const [heightIn, setHeightIn] = useState("");
   const [activityLevel, setActivityLevel] = useState("sedentary");
   const [calories, setCalories] = useState("");
   const [loading, setLoading] = useState(false);
+  const [error, setError] = useState("");
+
+  // Limit numeric input max digits
+  const handleNumericInput = (
+    value: string,
+    setter: React.Dispatch<React.SetStateAction<string>>,
+    maxDigits = 3
+  ) => {
+    const numeric = value.replace(/\D/g, "").slice(0, maxDigits);
+    setter(numeric);
+  };
+
+  // Convert ft & in to cm
+  const feetInchesToCm = (ft: number, inch: number) => {
+    return ft * 30.48 + inch * 2.54;
+  };
 
   const calculateCalories = () => {
-    if (!age || !weight || !height || !activityLevel) return;
+    setError("");
+    if (!age || !weight || !activityLevel) {
+      setError("Please fill in all required fields.");
+      setCalories("");
+      return;
+    }
+
+    // Validate age
+    const ageNum = parseFloat(age);
+    if (ageNum <= 0 || ageNum > 110) {
+      setError("Please enter an age between 1 and 110.");
+      setCalories("");
+      return;
+    }
+
+    // Validate weight
+    let weightNum = parseFloat(weight);
+    if (weightNum <= 0) {
+      setError("Please enter a positive weight.");
+      setCalories("");
+      return;
+    }
+
+    // Calculate height in cm depending on unit
+    let heightNum: number;
+    if (heightUnit === "cm") {
+      if (!heightCm) {
+        setError("Please enter your height in centimeters.");
+        setCalories("");
+        return;
+      }
+      heightNum = parseFloat(heightCm);
+      if (heightNum <= 0) {
+        setError("Please enter a positive height.");
+        setCalories("");
+        return;
+      }
+    } else {
+      // ft unit
+      const ftNum = parseFloat(heightFt);
+      const inNum = parseFloat(heightIn || "0"); // inches optional, default 0
+      if (!ftNum || ftNum <= 0) {
+        setError("Please enter your height in feet.");
+        setCalories("");
+        return;
+      }
+      if (inNum < 0) {
+        setError("Inches cannot be negative.");
+        setCalories("");
+        return;
+      }
+      heightNum = feetInchesToCm(ftNum, inNum);
+    }
+
+    // Convert weight lb to kg if needed
+    if (weightUnit === "lb") {
+      weightNum = weightNum * 0.453592;
+    }
 
     setLoading(true);
 
-    const ageNum = parseFloat(age);
-    const weightNum = parseFloat(weight);
-    const heightNum = parseFloat(height);
-
+    // Mifflin-St Jeor BMR formula (male)
     const bmr = 66 + 13.7 * weightNum + 5 * heightNum - 6.8 * ageNum;
 
-    let multiplier = 1.2; // Sedentary
+    let multiplier = 1.2; // Sedentary default
     switch (activityLevel) {
       case "light":
         multiplier = 1.375;
@@ -56,10 +130,10 @@ export default function CaloriePage() {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-b from-purple-50 to-white">
-      <div className="max-w-4xl mx-auto px-4 py-8">
-        <div className="flex items-center justify-between mb-8">
-          <h1 className="text-3xl font-bold text-gray-900">
+    <div className="min-h-screen bg-gradient-to-b from-purple-50 to-white p-4 sm:p-6 md:p-8">
+      <div className="max-w-4xl mx-auto">
+        <div className="flex flex-col md:flex-row items-center justify-between mb-8 gap-4 md:gap-0">
+          <h1 className="text-3xl font-bold text-gray-900 break-words text-center md:text-left">
             Daily Calorie Calculator
           </h1>
           <div className="flex items-center gap-2">
@@ -83,138 +157,201 @@ export default function CaloriePage() {
         </div>
 
         <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+          {/* Left: Food Nutrition Analyzer */}
           <FoodNutritionAnalyzer />
-          <div className="bg-white rounded-2xl shadow-sm">
-            <div className="p-6">
-              <div className="flex items-center justify-between mb-6">
-                <h2 className="text-2xl font-semibold text-gray-900">
-                  Daily Calculator
-                </h2>
-                <div className="w-12 h-12 rounded-full bg-purple-100 flex items-center justify-center">
-                  <svg
-                    className="w-6 h-6 text-purple-600"
-                    fill="none"
-                    stroke="currentColor"
-                    viewBox="0 0 24 24"
-                  >
-                    <path
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                      strokeWidth={2}
-                      d="M13 10V3L4 14h7v7l9-11h-7z"
-                    />
-                  </svg>
+
+          {/* Right: Calculator Form */}
+          <div className="bg-white rounded-2xl shadow-sm p-6">
+            <h2 className="text-2xl font-semibold text-gray-900 mb-6">
+              Daily Calculator
+            </h2>
+            <p className="text-gray-600 mb-8">
+              Calculate your daily calorie needs based on your activity level
+              and goals.
+            </p>
+
+            <form
+              onSubmit={(e) => {
+                e.preventDefault();
+                calculateCalories();
+              }}
+              className="space-y-6 max-w-md mx-auto"
+            >
+              {/* Age */}
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-2">
+                  Age
+                </label>
+                <div className="relative">
+                  <input
+                    type="text"
+                    inputMode="numeric"
+                    value={age}
+                    onChange={(e) =>
+                      handleNumericInput(e.target.value, setAge, 3)
+                    }
+                    placeholder="Enter your age"
+                    className="w-full px-4 py-3 rounded-xl bg-white border border-gray-300 text-gray-900 focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-purple-500 pr-10"
+                  />
+                  <span className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-500 pointer-events-none">
+                    years
+                  </span>
                 </div>
               </div>
 
-              <p className="text-gray-600 mb-8">
-                Calculate your daily calorie needs based on your activity level
-                and goals.
-              </p>
-
-              <form className="space-y-6">
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">
-                    Age
-                  </label>
-                  <div className="relative">
-                    <input
-                      type="number"
-                      value={age}
-                      onChange={(e) => setAge(e.target.value)}
-                      className="w-full px-4 py-3 rounded-xl bg-white border border-gray-300 text-gray-900 focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-purple-500 pr-10"
-                      placeholder="Enter your age"
-                    />
-                    <span className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-500">
-                      years
-                    </span>
-                  </div>
+              {/* Weight with unit */}
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-2 flex items-center justify-between">
+                  Weight
+                  <select
+                    value={weightUnit}
+                    onChange={(e) =>
+                      setWeightUnit(e.target.value === "lb" ? "lb" : "kg")
+                    }
+                    className="ml-2 rounded-xl border border-gray-300 bg-white text-gray-900 px-3 py-1 focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-purple-500"
+                  >
+                    <option value="kg">kg</option>
+                    <option value="lb">lb</option>
+                  </select>
+                </label>
+                <div className="relative">
+                  <input
+                    type="text"
+                    inputMode="numeric"
+                    value={weight}
+                    onChange={(e) =>
+                      handleNumericInput(e.target.value, setWeight, 3)
+                    }
+                    placeholder={`Enter your weight (${weightUnit})`}
+                    className="w-full px-4 py-3 rounded-xl bg-white border border-gray-300 text-gray-900 focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-purple-500 pr-10"
+                  />
+                  <span className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-500 pointer-events-none">
+                    {weightUnit}
+                  </span>
                 </div>
+              </div>
 
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">
-                    Weight
-                  </label>
+              {/* Height unit toggle */}
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-2 flex items-center justify-between">
+                  Height
+                  <select
+                    value={heightUnit}
+                    onChange={(e) =>
+                      setHeightUnit(e.target.value === "ft" ? "ft" : "cm")
+                    }
+                    className="ml-2 rounded-xl border border-gray-300 bg-white text-gray-900 px-3 py-1 focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-purple-500"
+                  >
+                    <option value="cm">cm</option>
+                    <option value="ft">feet/inches</option>
+                  </select>
+                </label>
+
+                {/* Height input fields */}
+                {heightUnit === "cm" ? (
                   <div className="relative">
                     <input
-                      type="number"
-                      value={weight}
-                      onChange={(e) => setWeight(e.target.value)}
+                      type="text"
+                      inputMode="numeric"
+                      value={heightCm}
+                      onChange={(e) =>
+                        handleNumericInput(e.target.value, setHeightCm, 3)
+                      }
+                      placeholder="Enter your height in cm"
                       className="w-full px-4 py-3 rounded-xl bg-white border border-gray-300 text-gray-900 focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-purple-500 pr-10"
-                      placeholder="Enter your weight"
                     />
-                    <span className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-500">
-                      kg
-                    </span>
-                  </div>
-                </div>
-
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">
-                    Height
-                  </label>
-                  <div className="relative">
-                    <input
-                      type="number"
-                      value={height}
-                      onChange={(e) => setHeight(e.target.value)}
-                      className="w-full px-4 py-3 rounded-xl bg-white border border-gray-300 text-gray-900 focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-purple-500 pr-10"
-                      placeholder="Enter your height"
-                    />
-                    <span className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-500">
+                    <span className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-500 pointer-events-none">
                       cm
                     </span>
                   </div>
-                </div>
-
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">
-                    Activity Level
-                  </label>
-                  <select
-                    value={activityLevel}
-                    onChange={(e) => setActivityLevel(e.target.value)}
-                    className="w-full px-4 py-3 rounded-xl bg-white border border-gray-300 text-gray-900 focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-purple-500"
-                  >
-                    <option value="sedentary">
-                      Sedentary (little or no exercise)
-                    </option>
-                    <option value="light">
-                      Light exercise (1-3 days/week)
-                    </option>
-                    <option value="moderate">
-                      Moderate exercise (3-5 days/week)
-                    </option>
-                    <option value="active">
-                      Heavy exercise (6-7 days/week)
-                    </option>
-                    <option value="very-active">
-                      Very heavy exercise (twice/day)
-                    </option>
-                  </select>
-                </div>
-
-                <button
-                  type="button"
-                  onClick={calculateCalories}
-                  className="w-full bg-gradient-to-r from-purple-600 to-purple-700 text-white py-3 rounded-xl hover:opacity-90 transition-all disabled:opacity-50 disabled:cursor-not-allowed"
-                  disabled={loading}
-                >
-                  {loading ? "Calculating..." : "Calculate Calories"}
-                </button>
-
-                {calories && (
-                  <div className="mt-6 p-4 bg-purple-50 rounded-xl">
-                    <h3 className="text-lg font-semibold text-gray-900 mb-2">
-                      Your Daily Calorie Needs
-                    </h3>
-                    <div className="text-2xl font-bold text-purple-600">
-                      {calories} kcal/day
+                ) : (
+                  <div className="flex gap-4">
+                    <div className="relative flex-1">
+                      <input
+                        type="text"
+                        inputMode="numeric"
+                        value={heightFt}
+                        onChange={(e) =>
+                          handleNumericInput(e.target.value, setHeightFt, 2)
+                        }
+                        placeholder="Feet"
+                        className="w-full px-4 py-3 rounded-xl bg-white border border-gray-300 text-gray-900 focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-purple-500"
+                      />
+                      <span className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-500 pointer-events-none">
+                        ft
+                      </span>
+                    </div>
+                    <div className="relative flex-1">
+                      <input
+                        type="text"
+                        inputMode="numeric"
+                        value={heightIn}
+                        onChange={(e) =>
+                          handleNumericInput(e.target.value, setHeightIn, 2)
+                        }
+                        placeholder="Inches"
+                        className="w-full px-4 py-3 rounded-xl bg-white border border-gray-300 text-gray-900 focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-purple-500"
+                      />
+                      <span className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-500 pointer-events-none">
+                        in
+                      </span>
                     </div>
                   </div>
                 )}
-              </form>
-            </div>
+              </div>
+
+              {/* Activity Level */}
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-2">
+                  Activity Level
+                </label>
+                <select
+                  value={activityLevel}
+                  onChange={(e) => setActivityLevel(e.target.value)}
+                  className="w-full px-4 py-3 rounded-xl bg-white border border-gray-300 text-gray-900 focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-purple-500"
+                >
+                  <option value="sedentary">
+                    Sedentary (little or no exercise)
+                  </option>
+                  <option value="light">Light exercise (1-3 days/week)</option>
+                  <option value="moderate">
+                    Moderate exercise (3-5 days/week)
+                  </option>
+                  <option value="active">Heavy exercise (6-7 days/week)</option>
+                  <option value="very-active">
+                    Very heavy exercise (twice/day)
+                  </option>
+                </select>
+              </div>
+
+              {/* Submit button */}
+              <button
+                type="submit"
+                className="w-full bg-gradient-to-r from-purple-600 to-purple-700 text-white py-3 rounded-xl hover:opacity-90 transition-all disabled:opacity-50 disabled:cursor-not-allowed"
+                disabled={loading}
+              >
+                {loading ? "Calculating..." : "Calculate Calories"}
+              </button>
+
+              {/* Error message */}
+              {error && (
+                <div className="mt-2 text-red-600 text-sm text-center">
+                  {error}
+                </div>
+              )}
+
+              {/* Result */}
+              {calories && !error && (
+                <div className="mt-6 p-4 bg-purple-50 rounded-xl text-center">
+                  <h3 className="text-lg font-semibold text-gray-900 mb-2">
+                    Your Daily Calorie Needs
+                  </h3>
+                  <div className="text-2xl font-bold text-purple-600">
+                    {calories} kcal/day
+                  </div>
+                </div>
+              )}
+            </form>
           </div>
         </div>
       </div>
