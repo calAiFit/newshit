@@ -17,6 +17,7 @@ export const BMICalculator = () => {
   const [weight, setWeight] = useState("");
   const [weightUnit, setWeightUnit] = useState<"kg" | "lbs">("kg");
   const [heightCm, setHeightCm] = useState("");
+  const [heightUnit, setHeightUnit] = useState<"cm" | "in">("cm");
   const [age, setAge] = useState("");
   const [gender, setGender] = useState("");
 
@@ -55,11 +56,31 @@ export const BMICalculator = () => {
     if (!validateInputs()) return;
 
     let w = parseFloat(weight);
+    if (isNaN(w) || w <= 0) {
+      setErrors((prev) => ({
+        ...prev,
+        weight: "Weight must be a positive number",
+      }));
+      return;
+    }
     // Convert lbs to kg if needed
     if (weightUnit === "lbs") {
       w = w * 0.453592;
     }
-    const h = parseFloat(heightCm) / 100;
+
+    let h = parseFloat(heightCm);
+    if (isNaN(h) || h <= 0) {
+      setErrors((prev) => ({
+        ...prev,
+        heightCm: "Height must be a positive number",
+      }));
+      return;
+    }
+    // Convert inches to cm if needed
+    if (heightUnit === "in") {
+      h = h * 2.54;
+    }
+    h = h / 100; // convert cm to meters
 
     if (h === 0) {
       setErrors((prev) => ({ ...prev, heightCm: "Height cannot be zero" }));
@@ -118,19 +139,36 @@ export const BMICalculator = () => {
             )}
           </div>
 
-          {/* Height in cm only */}
+          {/* Height with unit selector */}
           <div>
             <label className="block mb-2 text-gray-700 font-medium">
-              Height (cm)
+              Height
             </label>
-            <Input
-              type="text"
-              inputMode="numeric"
-              value={heightCm}
-              onChange={(e) => handleNumericInput(e.target.value, setHeightCm)}
-              placeholder="Enter height in cm"
-              maxLength={3}
-            />
+            <div className="flex gap-3">
+              <Input
+                type="text"
+                inputMode="numeric"
+                value={heightCm}
+                onChange={(e) =>
+                  handleNumericInput(e.target.value, setHeightCm)
+                }
+                placeholder={`Enter height in ${heightUnit}`}
+                className="flex-grow"
+                maxLength={3}
+              />
+              <Select
+                value={heightUnit}
+                onValueChange={(val) => setHeightUnit(val as "cm" | "in")}
+              >
+                <SelectTrigger className="w-24">
+                  <SelectValue />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="cm">cm</SelectItem>
+                  <SelectItem value="in">in</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
             {errors.heightCm && (
               <p className="text-red-500 text-sm mt-1">{errors.heightCm}</p>
             )}
@@ -190,6 +228,8 @@ export const BMICalculator = () => {
                   setBMICategory("");
                   setShowResults(false);
                   setErrors({ weight: "", heightCm: "", age: "", gender: "" });
+                  setHeightUnit("cm");
+                  setWeightUnit("kg");
                 }}
                 className="bg-gray-200 hover:bg-gray-300 text-gray-700 rounded-xl px-8 py-3 font-semibold transition-all duration-300"
               >

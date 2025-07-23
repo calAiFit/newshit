@@ -5,7 +5,8 @@ import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 import axios from "axios";
 import { ProfileData } from "@/app/types/profile";
-import { LoadingSpinner, ProfileDisplay, ProfileForm } from "@/app/components";
+import { LoadingSpinner, ProfileDisplay } from "@/app/components";
+import ClerkProvider from "@/app/ClientProviders";
 const ProfilePage = () => {
   const { user, isLoaded } = useUser();
   const router = useRouter();
@@ -118,11 +119,11 @@ const ProfilePage = () => {
   return (
     <div className="min-h-screen bg-gray-100 py-12 px-4 sm:px-6 lg:px-8">
       <div className="max-w-md mx-auto">
-        <ProfileForm
+        {/* <ProfileForm
           onSubmit={handleSubmit}
           error={error}
           submitting={submitting}
-        />
+        /> */}
       </div>
     </div>
   );
