@@ -1,11 +1,11 @@
 export interface ProfileData {
-  id: string;
-  age: string;
+  id?: string;
+  age: string | number;
   gender: string;
-  height: string;
-  weight: string;
-  targetWeight: string;
+  height: string | number;
+  weight: string | number;
+  targetWeight: string | number;
   activityLevel: string;
-  avatarUrl: string;
-  userId: string;
+  avatarUrl?: string;
+  userId?: string;
 }

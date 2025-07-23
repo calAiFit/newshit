@@ -51,7 +51,17 @@ export async function POST(req: NextRequest) {
       );
     }
 
-    // Prepare profile data
+    // Newtreh
+
+    //  age
+    //  height
+    //  weight
+    //  targetWeight
+
+    // Udur bolgon
+    // udriiin niit calore
+    // jin
+
     const user = await clerkClient.users.getUser(userId);
     const data = {
       name: user?.firstName || "Anonymous",

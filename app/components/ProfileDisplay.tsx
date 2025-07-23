@@ -1,8 +1,16 @@
 "use client";
 
-import { ProfileData } from "../types/profile";
 interface User {
   firstName: string;
+}
+
+interface ProfileData {
+  age: number;
+  gender: string;
+  height: number;
+  weight: number;
+  targetWeight: number;
+  activityLevel: string;
 }
 
 interface ProfileDisplayProps {

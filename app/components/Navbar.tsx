@@ -3,11 +3,17 @@
 import Link from "next/link";
 import { useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
+import { useAuth, useClerk } from "@clerk/nextjs";
 
 export const Navbar = () => {
   const [isOpen, setIsOpen] = useState(false);
+  const { isSignedIn } = useAuth();
+  const { signOut } = useClerk();
 
-  const navLinks = ["Home", "Workout", "Calorie", "Shop", "Profile"];
+  const navLinks = ["Home", "Workout", "Calorie", "Shop"];
+  if (isSignedIn) {
+    navLinks.push("Profile");
+  }
 
   return (
     <nav className="bg-white/90 backdrop-blur-md sticky top-0 z-50 shadow-sm">
@@ -45,6 +51,29 @@ export const Navbar = () => {
                 {label}
               </Link>
             ))}
+            {!isSignedIn ? (
+              <>
+                <Link
+                  href="/sign-in"
+                  className="text-gray-700 hover:text-purple-600 transition-colors font-medium"
+                >
+                  Sign In
+                </Link>
+                <Link
+                  href="/sign-up"
+                  className="bg-purple-600 text-white px-4 py-2 rounded-md hover:bg-purple-700 transition-colors font-medium"
+                >
+                  Sign Up
+                </Link>
+              </>
+            ) : (
+              <button
+                onClick={() => signOut()}
+                className="text-gray-700 hover:text-red-600 transition-colors font-medium"
+              >
+                Logout
+              </button>
+            )}
           </div>
 
           <button
@@ -100,6 +129,34 @@ export const Navbar = () => {
                     {label}
                   </Link>
                 ))}
+                {!isSignedIn ? (
+                  <>
+                    <Link
+                      href="/sign-in"
+                      className="block px-4 py-2 rounded-md text-gray-700 hover:text-purple-600 hover:bg-gray-50 transition-colors font-medium"
+                      onClick={() => setIsOpen(false)}
+                    >
+                      Sign In
+                    </Link>
+                    <Link
+                      href="/sign-up"
+                      className="block px-4 py-2 rounded-md bg-purple-600 text-white hover:bg-purple-700 transition-colors font-medium"
+                      onClick={() => setIsOpen(false)}
+                    >
+                      Sign Up
+                    </Link>
+                  </>
+                ) : (
+                  <button
+                    onClick={() => {
+                      signOut();
+                      setIsOpen(false);
+                    }}
+                    className="block w-full text-left px-4 py-2 rounded-md text-gray-700 hover:text-red-600 hover:bg-gray-50 transition-colors font-medium"
+                  >
+                    Logout
+                  </button>
+                )}
               </div>
             </motion.div>
           )}
