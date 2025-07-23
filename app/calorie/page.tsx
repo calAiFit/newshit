@@ -17,7 +17,6 @@ export default function CaloriePage() {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
 
-  // Limit numeric input max digits
   const handleNumericInput = (
     value: string,
     setter: React.Dispatch<React.SetStateAction<string>>,
@@ -27,7 +26,6 @@ export default function CaloriePage() {
     setter(numeric);
   };
 
-  // Convert ft & in to cm
   const feetInchesToCm = (ft: number, inch: number) => {
     return ft * 30.48 + inch * 2.54;
   };
@@ -40,7 +38,6 @@ export default function CaloriePage() {
       return;
     }
 
-    // Validate age
     const ageNum = parseFloat(age);
     if (ageNum <= 0 || ageNum > 110) {
       setError("Please enter an age between 1 and 110.");
@@ -48,7 +45,6 @@ export default function CaloriePage() {
       return;
     }
 
-    // Validate weight
     let weightNum = parseFloat(weight);
     if (weightNum <= 0) {
       setError("Please enter a positive weight.");
@@ -56,7 +52,6 @@ export default function CaloriePage() {
       return;
     }
 
-    // Calculate height in cm depending on unit
     let heightNum: number;
     if (heightUnit === "cm") {
       if (!heightCm) {
@@ -71,9 +66,8 @@ export default function CaloriePage() {
         return;
       }
     } else {
-      // ft unit
       const ftNum = parseFloat(heightFt);
-      const inNum = parseFloat(heightIn || "0"); // inches optional, default 0
+      const inNum = parseFloat(heightIn || "0");
       if (!ftNum || ftNum <= 0) {
         setError("Please enter your height in feet.");
         setCalories("");
@@ -87,17 +81,15 @@ export default function CaloriePage() {
       heightNum = feetInchesToCm(ftNum, inNum);
     }
 
-    // Convert weight lb to kg if needed
     if (weightUnit === "lb") {
       weightNum = weightNum * 0.453592;
     }
 
     setLoading(true);
 
-    // Mifflin-St Jeor BMR formula (male)
     const bmr = 66 + 13.7 * weightNum + 5 * heightNum - 6.8 * ageNum;
 
-    let multiplier = 1.2; // Sedentary default
+    let multiplier = 1.2;
     switch (activityLevel) {
       case "light":
         multiplier = 1.375;
@@ -157,10 +149,8 @@ export default function CaloriePage() {
         </div>
 
         <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-          {/* Left: Food Nutrition Analyzer */}
           <FoodNutritionAnalyzer />
 
-          {/* Right: Calculator Form */}
           <div className="bg-white rounded-2xl shadow-sm p-6">
             <h2 className="text-2xl font-semibold text-gray-900 mb-6">
               Daily Calculator
@@ -177,7 +167,6 @@ export default function CaloriePage() {
               }}
               className="space-y-6 max-w-md mx-auto"
             >
-              {/* Age */}
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-2">
                   Age
@@ -199,7 +188,6 @@ export default function CaloriePage() {
                 </div>
               </div>
 
-              {/* Weight with unit */}
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-2 flex items-center justify-between">
                   Weight
@@ -231,7 +219,6 @@ export default function CaloriePage() {
                 </div>
               </div>
 
-              {/* Height unit toggle */}
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-2 flex items-center justify-between">
                   Height
@@ -247,7 +234,6 @@ export default function CaloriePage() {
                   </select>
                 </label>
 
-                {/* Height input fields */}
                 {heightUnit === "cm" ? (
                   <div className="relative">
                     <input
@@ -300,7 +286,6 @@ export default function CaloriePage() {
                 )}
               </div>
 
-              {/* Activity Level */}
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-2">
                   Activity Level
@@ -324,7 +309,6 @@ export default function CaloriePage() {
                 </select>
               </div>
 
-              {/* Submit button */}
               <button
                 type="submit"
                 className="w-full bg-gradient-to-r from-purple-600 to-purple-700 text-white py-3 rounded-xl hover:opacity-90 transition-all disabled:opacity-50 disabled:cursor-not-allowed"
@@ -333,14 +317,12 @@ export default function CaloriePage() {
                 {loading ? "Calculating..." : "Calculate Calories"}
               </button>
 
-              {/* Error message */}
               {error && (
                 <div className="mt-2 text-red-600 text-sm text-center">
                   {error}
                 </div>
               )}
 
-              {/* Result */}
               {calories && !error && (
                 <div className="mt-6 p-4 bg-purple-50 rounded-xl text-center">
                   <h3 className="text-lg font-semibold text-gray-900 mb-2">

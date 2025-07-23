@@ -150,7 +150,6 @@ export const FoodNutritionAnalyzer = () => {
 
       {imageBase64 && (
         <div className="relative w-full h-48 mb-4 rounded-xl overflow-hidden border border-gray-300">
-          {/* Use next/image for optimization */}
           <Image
             src={imageBase64}
             alt="Selected"
@@ -248,7 +247,6 @@ export const FoodNutritionAnalyzer = () => {
         </div>
       )}
 
-      {/* Show detected food name */}
       {detectedFood && (
         <p className="hidden mb-2 text-center text-gray-700 font-semibold">
           Detected Food: {detectedFood}

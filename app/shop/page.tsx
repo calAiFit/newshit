@@ -21,18 +21,15 @@ export default function ShopPage() {
   const [selectedCategory, setSelectedCategory] = useState("");
   const [selectedProduct, setSelectedProduct] = useState<Product | null>(null);
 
-  // Load cart from localStorage
   useEffect(() => {
     const savedCart = localStorage.getItem("cart");
     if (savedCart) setCart(JSON.parse(savedCart));
   }, []);
 
-  // Save cart to localStorage
   useEffect(() => {
     localStorage.setItem("cart", JSON.stringify(cart));
   }, [cart]);
 
-  // Fetch products based on search query
   const searchProducts = async () => {
     try {
       const response = await axios.get(`/api/shop?q=${query}`);
@@ -43,7 +40,6 @@ export default function ShopPage() {
     }
   };
 
-  // Filter by category
   useEffect(() => {
     if (!selectedCategory) setFiltered(products);
     else {
@@ -55,13 +51,11 @@ export default function ShopPage() {
     }
   }, [selectedCategory, products]);
 
-  // Add product to cart
   const handleAddToCart = (product: Product) => {
     setCart((prev) => [...prev, product]);
     toast.success(`${product.title} added to cart`);
   };
 
-  // Remove product from cart
   const handleRemoveFromCart = (index: number) => {
     const updatedCart = [...cart];
     updatedCart.splice(index, 1);
@@ -75,7 +69,6 @@ export default function ShopPage() {
         🛒 Supplement Shop
       </h1>
 
-      {/* Search and Filter */}
       <div className="flex gap-2 mb-4">
         <Input
           placeholder="Search..."
@@ -108,7 +101,6 @@ export default function ShopPage() {
         </select>
       </div>
 
-      {/* Product List */}
       <div className="space-y-4">
         {filtered.map((item) => (
           <div
@@ -132,7 +124,6 @@ export default function ShopPage() {
         ))}
       </div>
 
-      {/* Cart Section */}
       <div className="mt-8">
         <h2 className="text-xl font-semibold mb-4">🛍️ My Cart</h2>
         {cart.length === 0 ? (
@@ -173,7 +164,6 @@ export default function ShopPage() {
         )}
       </div>
 
-      {/* Modal for Product Detail */}
       {selectedProduct && (
         <div className="fixed inset-0 bg-black/60 flex items-center justify-center z-50">
           <div className="bg-white p-6 rounded shadow max-w-md w-full relative">

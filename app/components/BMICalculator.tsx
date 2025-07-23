@@ -63,7 +63,7 @@ export const BMICalculator = () => {
       }));
       return;
     }
-    // Convert lbs to kg if needed
+
     if (weightUnit === "lbs") {
       w = w * 0.453592;
     }
@@ -76,11 +76,11 @@ export const BMICalculator = () => {
       }));
       return;
     }
-    // Convert inches to cm if needed
+
     if (heightUnit === "in") {
       h = h * 2.54;
     }
-    h = h / 100; // convert cm to meters
+    h = h / 100;
 
     if (h === 0) {
       setErrors((prev) => ({ ...prev, heightCm: "Height cannot be zero" }));
@@ -106,7 +106,6 @@ export const BMICalculator = () => {
         </h1>
 
         <div className="space-y-6">
-          {/* Weight with unit selector */}
           <div>
             <label className="block mb-2 text-gray-700 font-medium">
               Weight
@@ -139,7 +138,6 @@ export const BMICalculator = () => {
             )}
           </div>
 
-          {/* Height with unit selector */}
           <div>
             <label className="block mb-2 text-gray-700 font-medium">
               Height
@@ -174,7 +172,6 @@ export const BMICalculator = () => {
             )}
           </div>
 
-          {/* Age */}
           <div>
             <label className="block mb-2 text-gray-700 font-medium">Age</label>
             <Input
@@ -190,7 +187,6 @@ export const BMICalculator = () => {
             )}
           </div>
 
-          {/* Gender */}
           <div>
             <label className="block mb-2 text-gray-700 font-medium">
               Gender
@@ -209,7 +205,6 @@ export const BMICalculator = () => {
             )}
           </div>
 
-          {/* Buttons */}
           <div className="flex gap-4 justify-center mt-6">
             <Button
               onClick={calculateBMI}
@@ -239,7 +234,6 @@ export const BMICalculator = () => {
           </div>
         </div>
 
-        {/* Results */}
         {showResults && (
           <motion.div
             initial={{ opacity: 0, y: 20 }}

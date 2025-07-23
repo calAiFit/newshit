@@ -13,7 +13,6 @@ export const Navbar = () => {
     <nav className="bg-white/90 backdrop-blur-md sticky top-0 z-50 shadow-sm">
       <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex justify-between items-center h-16">
-          {/* Logo */}
           <Link
             href="/"
             className="flex items-center gap-2 text-2xl font-bold text-purple-600 hover:text-purple-700 transition-colors"
@@ -34,7 +33,6 @@ export const Navbar = () => {
             NutriAi
           </Link>
 
-          {/* Desktop Nav */}
           <div className="hidden md:flex space-x-6">
             {navLinks.map((label) => (
               <Link
@@ -49,7 +47,6 @@ export const Navbar = () => {
             ))}
           </div>
 
-          {/* Mobile Menu Button */}
           <button
             onClick={() => setIsOpen(!isOpen)}
             aria-label="Toggle menu"
@@ -81,7 +78,6 @@ export const Navbar = () => {
           </button>
         </div>
 
-        {/* Mobile Navigation with Framer Motion */}
         <AnimatePresence>
           {isOpen && (
             <motion.div
