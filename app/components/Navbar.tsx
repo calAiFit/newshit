@@ -39,7 +39,7 @@ export const Navbar = () => {
             NutriAi
           </Link>
 
-          <div className="hidden md:flex space-x-6">
+          <div className="hidden md:flex items-center space-x-6">
             {navLinks.map((label) => (
               <Link
                 key={label}
@@ -51,11 +51,12 @@ export const Navbar = () => {
                 {label}
               </Link>
             ))}
+
             {!isSignedIn ? (
               <>
                 <Link
                   href="/sign-in"
-                  className="text-gray-700 hover:text-purple-600 transition-colors font-medium"
+                  className="text-gray-700 hover:text-purple-600 transition-colors font-medium px-4 py-2"
                 >
                   Sign In
                 </Link>
@@ -69,7 +70,7 @@ export const Navbar = () => {
             ) : (
               <button
                 onClick={() => signOut()}
-                className="text-gray-700 hover:text-red-600 transition-colors font-medium"
+                className="text-gray-700 hover:text-red-600 transition-colors font-medium px-4 py-2"
               >
                 Logout
               </button>
@@ -80,7 +81,7 @@ export const Navbar = () => {
             onClick={() => setIsOpen(!isOpen)}
             aria-label="Toggle menu"
             aria-expanded={isOpen}
-            className="md:hidden p-2 rounded-md hover:bg-gray-100 transition"
+            className="md:hidden p-2 rounded-md hover:bg-gray-100 transition focus:outline-none focus:ring focus:ring-purple-200"
           >
             <svg
               className="w-6 h-6"
@@ -133,14 +134,14 @@ export const Navbar = () => {
                   <>
                     <Link
                       href="/sign-in"
-                      className="block px-4 py-2 rounded-md text-gray-700 hover:text-purple-600 hover:bg-gray-50 transition-colors font-medium"
+                      className="block px-4 py-2 rounded-md text-gray-700 hover:text-purple-600 hover:bg-gray-50 transition-colors font-medium focus:outline-none focus:ring focus:ring-purple-200"
                       onClick={() => setIsOpen(false)}
                     >
                       Sign In
                     </Link>
                     <Link
                       href="/sign-up"
-                      className="block px-4 py-2 rounded-md bg-purple-600 text-white hover:bg-purple-700 transition-colors font-medium"
+                      className="block px-6 py-2 rounded-md bg-gradient-to-r from-purple-600 to-indigo-500 text-white font-semibold shadow-md hover:from-purple-700 hover:to-indigo-600 transition-all focus:outline-none focus:ring-2 focus:ring-purple-300"
                       onClick={() => setIsOpen(false)}
                     >
                       Sign Up
@@ -152,7 +153,7 @@ export const Navbar = () => {
                       signOut();
                       setIsOpen(false);
                     }}
-                    className="block w-full text-left px-4 py-2 rounded-md text-gray-700 hover:text-red-600 hover:bg-gray-50 transition-colors font-medium"
+                    className="block w-full text-left px-4 py-2 rounded-md text-gray-700 hover:text-red-600 hover:bg-gray-50 transition-colors font-medium focus:outline-none focus:ring focus:ring-red-200"
                   >
                     Logout
                   </button>

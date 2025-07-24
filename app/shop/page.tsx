@@ -4,7 +4,12 @@ import { useEffect, useState } from "react";
 import axios from "axios";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
-import { toast } from "react-hot-toast";
+import { Loader } from "@/components/ui/loader";
+
+const toast = {
+  success: (msg: string) => console.log("Success:", msg),
+  error: (msg: string) => console.log("Error:", msg),
+};
 
 interface Product {
   id: number;
@@ -18,8 +23,8 @@ export default function ShopPage() {
   const [products, setProducts] = useState<Product[]>([]);
   const [filtered, setFiltered] = useState<Product[]>([]);
   const [cart, setCart] = useState<Product[]>([]);
-  const [selectedCategory, setSelectedCategory] = useState("");
   const [selectedProduct, setSelectedProduct] = useState<Product | null>(null);
+  const [loading, setLoading] = useState(false);
 
   useEffect(() => {
     const savedCart = localStorage.getItem("cart");
@@ -31,25 +36,19 @@ export default function ShopPage() {
   }, [cart]);
 
   const searchProducts = async () => {
+    setLoading(true);
     try {
       const response = await axios.get(`/api/shop?q=${query}`);
-      setProducts(response.data.products);
-      setFiltered(response.data.products);
+      const results = response.data.products;
+
+      setProducts(results);
+      setFiltered(results);
     } catch (err) {
       toast.error("Error fetching products");
+    } finally {
+      setLoading(false);
     }
   };
-
-  useEffect(() => {
-    if (!selectedCategory) setFiltered(products);
-    else {
-      setFiltered(
-        products.filter((p) =>
-          p.title.toLowerCase().includes(selectedCategory.toLowerCase())
-        )
-      );
-    }
-  }, [selectedCategory, products]);
 
   const handleAddToCart = (product: Product) => {
     setCart((prev) => [...prev, product]);
@@ -64,131 +63,179 @@ export default function ShopPage() {
   };
 
   return (
-    <div className="p-4 max-w-4xl mx-auto">
-      <h1 className="text-2xl font-bold mb-4 flex items-center gap-2">
+    <div className="min-h-screen bg-gradient-to-br from-purple-100 via-purple-50 to-indigo-100 p-6 max-w-7xl mx-auto relative overflow-x-hidden">
+      <h1 className="text-4xl font-extrabold mb-10 text-purple-700 text-center md:text-left">
         🛒 Supplement Shop
       </h1>
 
-      <div className="flex gap-2 mb-4">
+      {/* Search */}
+      <div className="flex flex-col md:flex-row gap-4 mb-8 items-center justify-center md:justify-start">
         <Input
-          placeholder="Search..."
+          placeholder="Search supplements..."
           value={query}
           onChange={(e) => setQuery(e.target.value)}
+          onKeyDown={(e) => {
+            if (e.key === "Enter") searchProducts();
+          }}
+          className="w-full md:max-w-sm rounded-lg"
         />
-        <Button onClick={searchProducts}>Search</Button>
-        <select
-          className="border rounded px-2"
-          onChange={(e) => setSelectedCategory(e.target.value)}
+        <Button
+          onClick={searchProducts}
+          className="rounded-lg px-8 py-3 font-semibold bg-gradient-to-r from-purple-600 to-indigo-500 text-white hover:from-purple-700 hover:to-indigo-600 transition"
         >
-          <option value="">All</option>
-          <option value="whey">Whey</option>
-          <option value="creatine">Creatine</option>
-          <option value="pre">Pre-workout</option>
-          <option value="vitamins">Vitamins</option>
-          <option value="protein">Protein</option>
-          <option value="bcaas">BCAAs</option>
-          <option value="fatburners">Fat Burners</option>
-          <option value="testosterone">Testosterone Boosters</option>
-          <option value="multivitamins">Multivitamins</option>
-          <option value="greens">Greens</option>
-          <option value="omega">Omega-3</option>
-          <option value="probiotics">Probiotics</option>
-          <option value="sleep">Sleep Aids</option>
-          <option value="joint">Joint Support</option>
-          <option value="energy">Energy Supplements</option>
-          <option value="recovery">Recovery Supplements</option>
-          <option value="meal">Meal Replacements</option>
-        </select>
+          Search
+        </Button>
       </div>
 
-      <div className="space-y-4">
-        {filtered.map((item) => (
-          <div
-            key={item.id}
-            className="border p-4 rounded flex gap-4 items-center justify-between"
-          >
-            <div className="flex items-center gap-4">
-              <img src={item.image} className="w-16 h-16 object-cover" />
-              <div>
-                <h3
-                  className="font-semibold cursor-pointer"
+      <div className="flex flex-col lg:flex-row gap-10">
+        {/* Products grid */}
+        <div className="flex-1">
+          {loading ? (
+            <Loader />
+          ) : filtered.length === 0 ? (
+            <div className="text-center mt-24 text-gray-500">
+              <p className="text-lg mb-4">No products found for your search.</p>
+              <img
+                src="/empty-box.svg"
+                alt="No products"
+                className="mx-auto w-48 opacity-50"
+              />
+            </div>
+          ) : (
+            <div className="grid grid-cols-2 sm:grid-cols-2 md:grid-cols-3 gap-6">
+              {filtered.map((item, idx) => (
+                <div
+                  key={item.id}
+                  className="bg-white rounded-2xl shadow-md p-5 flex flex-col relative group cursor-pointer hover:shadow-2xl hover:scale-[1.03] transition-transform border border-transparent hover:border-purple-400"
                   onClick={() => setSelectedProduct(item)}
                 >
-                  {item.title}
-                </h3>
-                <p className="text-xs text-gray-500">ID: {item.id}</p>
-              </div>
-            </div>
-            <Button onClick={() => handleAddToCart(item)}>Add to Cart</Button>
-          </div>
-        ))}
-      </div>
-
-      <div className="mt-8">
-        <h2 className="text-xl font-semibold mb-4">🛍️ My Cart</h2>
-        {cart.length === 0 ? (
-          <p className="text-gray-500">Your cart is empty.</p>
-        ) : (
-          <div className="space-y-4">
-            {cart.map((item, index) => (
-              <div
-                key={index}
-                className="border p-3 rounded flex items-center justify-between"
-              >
-                <div className="flex items-center gap-4">
-                  <img src={item.image} className="w-12 h-12 object-cover" />
-                  <div>
-                    <p className="font-medium">{item.title}</p>
-                    <p className="text-xs text-gray-500">ID: {item.id}</p>
+                  {idx % 3 === 0 && (
+                    <span className="absolute top-4 left-4 bg-gradient-to-r from-purple-500 to-indigo-400 text-white text-xs px-3 py-1 rounded-full font-bold shadow-sm select-none pointer-events-none">
+                      Popular
+                    </span>
+                  )}
+                  <div className="w-full aspect-square mb-4 flex items-center justify-center overflow-hidden rounded-xl bg-purple-50 border border-purple-100 group-hover:scale-105 transition-transform">
+                    <img
+                      src={item.image}
+                      alt={item.title}
+                      className="object-contain h-4/5 w-4/5"
+                      loading="lazy"
+                    />
                   </div>
+                  <h3 className="font-semibold text-lg mb-2 line-clamp-2 min-h-[48px] hover:text-purple-600">
+                    {item.title}
+                  </h3>
+                  <div className="flex justify-between mb-2">
+                    <span className="text-purple-700 font-bold text-base">
+                      ₮{item.id.toLocaleString()}
+                    </span>
+                  </div>
+                  <Button
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      handleAddToCart(item);
+                    }}
+                    className="w-full rounded-full bg-gradient-to-r from-purple-600 to-indigo-500 text-white font-semibold py-2 mt-auto shadow-lg hover:from-purple-700 hover:to-indigo-600 transition"
+                  >
+                    Add to Cart
+                  </Button>
                 </div>
-                <button
-                  onClick={() => handleRemoveFromCart(index)}
-                  className="text-red-500 hover:underline text-sm"
-                >
-                  Remove
-                </button>
+              ))}
+            </div>
+          )}
+        </div>
+
+        {/* Cart summary */}
+        <aside className="lg:w-96 sticky top-24 bg-white rounded-2xl shadow-lg p-6 border border-purple-100 self-start">
+          <h2 className="text-xl sm:text-2xl font-bold mb-6 text-purple-700 text-center">
+            🛍️ My Cart
+          </h2>
+          {cart.length === 0 ? (
+            <p className="text-gray-500 text-center">Your cart is empty.</p>
+          ) : (
+            <>
+              <div className="space-y-4 max-h-[60vh] overflow-y-auto mb-6">
+                {cart.map((item, index) => (
+                  <div
+                    key={index}
+                    className="flex justify-between items-center border-b border-gray-100 pb-3"
+                  >
+                    <div className="flex items-center gap-4">
+                      <img
+                        src={item.image}
+                        className="w-14 h-14 object-cover rounded-lg"
+                        alt={item.title}
+                        loading="lazy"
+                      />
+                      <div>
+                        <p className="font-medium text-sm line-clamp-1">
+                          {item.title}
+                        </p>
+                        <p className="text-xs text-gray-400">ID: {item.id}</p>
+                      </div>
+                    </div>
+                    <button
+                      onClick={() => handleRemoveFromCart(index)}
+                      className="text-red-500 hover:underline text-xs font-semibold"
+                    >
+                      Remove
+                    </button>
+                  </div>
+                ))}
               </div>
-            ))}
-            <Button
-              variant="outline"
-              className="mt-4"
-              onClick={() => {
-                setCart([]);
-                toast.success("Cart cleared");
-              }}
-            >
-              Clear Cart
-            </Button>
-          </div>
-        )}
+              <Button
+                variant="outline"
+                className="w-full border-2 border-purple-400 text-purple-700 font-semibold rounded-full px-6 py-2 shadow hover:bg-purple-100 transition"
+                onClick={() => {
+                  setCart([]);
+                  toast.success("Cart cleared");
+                }}
+              >
+                Clear Cart
+              </Button>
+            </>
+          )}
+        </aside>
       </div>
 
+      {/* Modal */}
       {selectedProduct && (
-        <div className="fixed inset-0 bg-black/60 flex items-center justify-center z-50">
-          <div className="bg-white p-6 rounded shadow max-w-md w-full relative">
+        <div className="fixed inset-0 bg-black/70 flex items-center justify-center z-50 px-4 animate-fade-in">
+          <div className="bg-white p-8 rounded-2xl shadow-2xl w-full max-w-md relative">
             <button
               onClick={() => setSelectedProduct(null)}
-              className="absolute top-2 right-2 text-xl"
+              className="absolute top-3 right-4 text-3xl font-bold text-gray-400 hover:text-purple-700 transition"
+              aria-label="Close"
             >
               ×
             </button>
             <img
               src={selectedProduct.image}
-              className="w-full h-48 object-cover mb-4 rounded"
+              className="w-full h-48 object-cover mb-4 rounded-xl"
+              alt={selectedProduct.title}
             />
-            <h2 className="text-xl font-semibold mb-2">
+            <h2 className="text-2xl font-bold mb-2 text-purple-700">
               {selectedProduct.title}
             </h2>
-            <p className="text-sm text-gray-600">
+            <p className="text-sm text-gray-600 mb-2">
               Product ID: {selectedProduct.id}
             </p>
-            <p className="mt-2 text-gray-700">
-              (You can add nutrition info or product description here.)
+            <p className="text-sm text-gray-700">
+              This is a detailed product description.
             </p>
           </div>
         </div>
       )}
+
+      <style>{`
+        .animate-fade-in {
+          animation: fadeIn 0.3s ease-in-out forwards;
+        }
+        @keyframes fadeIn {
+          from { opacity: 0 }
+          to { opacity: 1 }
+        }
+      `}</style>
     </div>
   );
 }
