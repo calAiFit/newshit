@@ -1,3 +1,4 @@
+"use client";
 import { BMICalculator } from "./components";
 import { CalorieCircle } from "./components/CalorieCircle";
 import { useAuth, SignIn } from "@clerk/nextjs";
@@ -5,7 +6,12 @@ import { useAuth, SignIn } from "@clerk/nextjs";
 const Home = () => {
   const { isSignedIn, isLoaded } = useAuth();
 
-  if (!isLoaded) return <div className="min-h-screen flex items-center justify-center"><div className="animate-spin rounded-full h-8 w-8 border-b-2 border-purple-600"></div></div>;
+  if (!isLoaded)
+    return (
+      <div className="min-h-screen flex items-center justify-center">
+        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-purple-600"></div>
+      </div>
+    );
   if (!isSignedIn) return <SignIn />;
 
   return (
