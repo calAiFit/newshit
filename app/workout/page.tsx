@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { useAuth, SignIn } from "@clerk/nextjs";
+
 
 interface ActivityLevel {
   [key: string]: number;
@@ -86,7 +86,7 @@ const MET_VALUES: METValues = {
 };
 
 export default function WorkoutPage() {
-  const { isSignedIn, isLoaded } = useAuth();
+
   const [selectedCategory, setSelectedCategory] = useState<string>("");
   const [weight, setWeight] = useState("");
   const [weightUnit, setWeightUnit] = useState<"kg" | "lb">("kg");
@@ -96,8 +96,7 @@ export default function WorkoutPage() {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
 
-  if (!isLoaded) return <div className="min-h-screen flex items-center justify-center"><div className="animate-spin rounded-full h-8 w-8 border-b-2 border-purple-600"></div></div>;
-  if (!isSignedIn) return <SignIn />;
+
 
   const handleNumericInput = (value: string, setter: (val: string) => void) => {
     const numeric = value.replace(/\D/g, "").slice(0, 3);

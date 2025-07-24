@@ -5,7 +5,7 @@ import axios from "axios";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Loader } from "@/components/ui/loader";
-import { useAuth, SignIn } from "@clerk/nextjs";
+
 
 const toast = {
   success: (msg: string) => console.log("Success:", msg),
@@ -20,7 +20,7 @@ interface Product {
 }
 
 export default function ShopPage() {
-  const { isSignedIn, isLoaded } = useAuth();
+
   const [query, setQuery] = useState("");
 
   const [filtered, setFiltered] = useState<Product[]>([]);
@@ -37,8 +37,7 @@ export default function ShopPage() {
     localStorage.setItem("cart", JSON.stringify(cart));
   }, [cart]);
 
-  if (!isLoaded) return <Loader />;
-  if (!isSignedIn) return <SignIn />;
+
 
   const searchProducts = async () => {
     setLoading(true);
