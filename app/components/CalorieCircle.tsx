@@ -31,7 +31,13 @@ export const CalorieCircle = ({ consumedCalories = 0 }: CalorieCircleProps) => {
   // Calculate daily calorie needs from user profile
   useEffect(() => {
     if (user?.unsafeMetadata?.profile) {
-      const profile = user.unsafeMetadata.profile as any;
+      const profile = user.unsafeMetadata.profile as {
+        age: number;
+        weight: number;
+        height: number;
+        gender: string;
+        activityLevel: string;
+      };
       const { age, weight, height, gender, activityLevel } = profile;
 
       if (age && weight && height && gender && activityLevel) {
@@ -258,7 +264,7 @@ export const CalorieCircle = ({ consumedCalories = 0 }: CalorieCircleProps) => {
       {/* Today's Schedule */}
       <div className="mt-6">
         <h2 className="text-lg font-semibold text-gray-900 mb-3">
-          Today's Schedule
+          Today&apos;s Schedule
         </h2>
         <div className="space-y-2">
           {todaySchedule.map((item, index) => {

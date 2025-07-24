@@ -22,14 +22,11 @@ interface Product {
 export default function ShopPage() {
   const { isSignedIn, isLoaded } = useAuth();
   const [query, setQuery] = useState("");
-  const [products, setProducts] = useState<Product[]>([]);
+
   const [filtered, setFiltered] = useState<Product[]>([]);
   const [cart, setCart] = useState<Product[]>([]);
   const [selectedProduct, setSelectedProduct] = useState<Product | null>(null);
   const [loading, setLoading] = useState(false);
-
-  if (!isLoaded) return <Loader />;
-  if (!isSignedIn) return <SignIn />;
 
   useEffect(() => {
     const savedCart = localStorage.getItem("cart");
@@ -40,15 +37,18 @@ export default function ShopPage() {
     localStorage.setItem("cart", JSON.stringify(cart));
   }, [cart]);
 
+  if (!isLoaded) return <Loader />;
+  if (!isSignedIn) return <SignIn />;
+
   const searchProducts = async () => {
     setLoading(true);
     try {
       const response = await axios.get(`/api/shop?q=${query}`);
       const results = response.data.products;
 
-      setProducts(results);
+
       setFiltered(results);
-    } catch (err) {
+    } catch {
       toast.error("Error fetching products");
     } finally {
       setLoading(false);
@@ -100,11 +100,9 @@ export default function ShopPage() {
           ) : filtered.length === 0 ? (
             <div className="text-center mt-24 text-gray-500">
               <p className="text-lg mb-4">No products found for your search.</p>
-              <img
-                src="/empty-box.svg"
-                alt="No products"
-                className="mx-auto w-48 opacity-50"
-              />
+              <div className="mx-auto w-48 h-48 bg-gray-200 rounded-lg flex items-center justify-center opacity-50">
+                <span className="text-gray-400 text-4xl">📦</span>
+              </div>
             </div>
           ) : (
             <div className="grid grid-cols-2 sm:grid-cols-2 md:grid-cols-3 gap-6">
