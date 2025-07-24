@@ -1,10 +1,11 @@
 "use client";
 
 import { useState } from "react";
-
+import { useAuth, SignIn } from "@clerk/nextjs";
 import { FoodNutritionAnalyzer } from "../components";
 
 export default function CaloriePage() {
+  const { isSignedIn, isLoaded } = useAuth();
   const [age, setAge] = useState("");
   const [weight, setWeight] = useState("");
   const [weightUnit, setWeightUnit] = useState<"kg" | "lb">("kg");
@@ -16,6 +17,9 @@ export default function CaloriePage() {
   const [calories, setCalories] = useState("");
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
+
+  if (!isLoaded) return <div className="flex items-center justify-center min-h-screen"><div className="animate-spin h-12 w-12 border-4 border-purple-500 border-t-transparent rounded-full"></div></div>;
+  if (!isSignedIn) return <SignIn />;
 
   const handleNumericInput = (
     value: string,

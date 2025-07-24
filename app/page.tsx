@@ -1,7 +1,13 @@
 import { BMICalculator } from "./components";
 import { CalorieCircle } from "./components/CalorieCircle";
+import { useAuth, SignIn } from "@clerk/nextjs";
 
 const Home = () => {
+  const { isSignedIn, isLoaded } = useAuth();
+
+  if (!isLoaded) return <div className="min-h-screen flex items-center justify-center"><div className="animate-spin rounded-full h-8 w-8 border-b-2 border-purple-600"></div></div>;
+  if (!isSignedIn) return <SignIn />;
+
   return (
     <div className="min-h-screen bg-white">
       <div className="max-w-4xl mx-auto px-4 py-8">

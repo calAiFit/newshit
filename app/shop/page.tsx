@@ -5,6 +5,7 @@ import axios from "axios";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Loader } from "@/components/ui/loader";
+import { useAuth, SignIn } from "@clerk/nextjs";
 
 const toast = {
   success: (msg: string) => console.log("Success:", msg),
@@ -19,12 +20,16 @@ interface Product {
 }
 
 export default function ShopPage() {
+  const { isSignedIn, isLoaded } = useAuth();
   const [query, setQuery] = useState("");
   const [products, setProducts] = useState<Product[]>([]);
   const [filtered, setFiltered] = useState<Product[]>([]);
   const [cart, setCart] = useState<Product[]>([]);
   const [selectedProduct, setSelectedProduct] = useState<Product | null>(null);
   const [loading, setLoading] = useState(false);
+
+  if (!isLoaded) return <Loader />;
+  if (!isSignedIn) return <SignIn />;
 
   useEffect(() => {
     const savedCart = localStorage.getItem("cart");
@@ -164,7 +169,7 @@ export default function ShopPage() {
                       <img
                         src={item.image}
                         className="w-14 h-14 object-cover rounded-lg"
-                        alt={item.title}
+                        alt={item.title || 'Cart item'}
                         loading="lazy"
                       />
                       <div>
@@ -212,7 +217,7 @@ export default function ShopPage() {
             <img
               src={selectedProduct.image}
               className="w-full h-48 object-cover mb-4 rounded-xl"
-              alt={selectedProduct.title}
+              alt={selectedProduct.title || 'Product detail'}
             />
             <h2 className="text-2xl font-bold mb-2 text-purple-700">
               {selectedProduct.title}

@@ -17,7 +17,7 @@ const SignInPage = () => {
           </p>
           <div className="mt-8 flex flex-col items-center md:items-start">
             <p className="text-sm text-white/80 mb-4">
-              Don't have an account yet?
+              Don&apos;t have an account yet?
             </p>
             <Link
               href="/sign-up"

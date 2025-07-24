@@ -106,7 +106,7 @@ const OnboardingPage = () => {
             Welcome to NutriAi!
           </h1>
           <p className="mt-2 text-gray-600">
-            Let's set up your profile to personalize your fitness journey
+            Let&apos;s set up your profile to personalize your fitness journey
           </p>
 
           <div className="flex items-center justify-center mt-6 mb-8">
