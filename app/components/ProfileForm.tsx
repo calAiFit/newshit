@@ -37,7 +37,7 @@ export const ProfileForm = ({
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
-    const numericValue = value.replace(/\D/g, "");
+    const numericValue = value.replace(/\D/g, "").slice(0, 3); // Limit to 3 digits
     setForm((prev) => ({
       ...prev,
       [name]: numericValue,

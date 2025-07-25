@@ -248,7 +248,7 @@ export const FoodNutritionAnalyzer = () => {
       )}
 
       {detectedFood && (
-        <p className="hidden mb-2 text-center text-gray-700 font-semibold">
+        <p className="mb-2 text-center text-gray-700 font-semibold">
           Detected Food: {detectedFood}
         </p>
       )}
